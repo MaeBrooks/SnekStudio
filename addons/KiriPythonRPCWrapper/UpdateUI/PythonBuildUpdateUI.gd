@@ -498,7 +498,7 @@ func _download_platform_requirements(platform_name : String, automated : bool = 
 		"Linux-x86_64" : "manylinux2014_x86_64",
 		"Linux-arm64" : "manylinux2014_aarch64",
 		"macOS-x86_64" : "macosx_11_0_universal2", # FIXME: Find something that works here. (macOS x86_64)
-		"macOS-arm64" : "macosx_11_0_universal2"
+		"macOS-arm64" : "macosx_11_0_arm64"
 	}
 
 	var this_platform_download_path : String = \
