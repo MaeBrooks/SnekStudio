@@ -326,6 +326,13 @@ func _handle_download_finished(
 	# Update UI.
 	_update_platform_ui()
 
+func are_platform_files_ready() -> bool:
+	for platform in _current_downloads.keys():
+		if not _check_platform_file_ready(platform):
+			return false
+
+	return true
+
 func _start_github_download(platform : String):
 	assert(not _current_downloads.has(platform))
 	var _current_request = HTTPRequest.new()
@@ -452,11 +459,17 @@ func _get_latest_version_releaseinfo_completed(
 	_cleanup_request()
 
 func _on_button_download_requirements_pressed(platform_name : String) -> void:
-	download_platform_requirements(platform_name)
+	_download_platform_requirements(platform_name)
 	_update_platform_ui()
 
-func download_platform_requirements(platform_name : String, automated : bool = false) -> bool:
-	
+func download_platform_requirements(is_automated : bool = false) -> bool:
+	for platform in _current_downloads.keys():
+		if not _download_platform_requirements(platform, is_automated):
+			return false
+
+	return true
+
+func _download_platform_requirements(platform_name : String, automated : bool = false) -> bool:
 	_load_platform_status()
 
 	var download_path : String = get_script().resource_path.get_base_dir().path_join("../Wheels")
@@ -484,7 +497,7 @@ func download_platform_requirements(platform_name : String, automated : bool = f
 		"Windows-x86_64" : "win_amd64",
 		"Linux-x86_64" : "manylinux2014_x86_64",
 		"Linux-arm64" : "manylinux2014_aarch64",
-		"macOS-x86_64" : "macosx_11_0_universal2", # FIXME: Find something that works here. (macOS)
+		"macOS-x86_64" : "macosx_11_0_universal2", # FIXME: Find something that works here. (macOS x86_64)
 		"macOS-arm64" : "macosx-10.9-universal2"
 	}
 
