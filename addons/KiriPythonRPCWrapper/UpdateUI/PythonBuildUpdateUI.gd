@@ -498,7 +498,7 @@ func _download_platform_requirements(platform_name : String, automated : bool = 
 		"Linux-x86_64" : "manylinux2014_x86_64",
 		"Linux-arm64" : "manylinux2014_aarch64",
 		"macOS-x86_64" : "macosx_11_0_universal2", # FIXME: Find something that works here. (macOS x86_64)
-		"macOS-arm64" : "macosx-10.9-universal2"
+		"macOS-arm64" : "macosx_11_0_universal2"
 	}
 
 	var this_platform_download_path : String = \
@@ -522,15 +522,17 @@ func _download_platform_requirements(platform_name : String, automated : bool = 
 		"-d", ProjectSettings.globalize_path(this_platform_download_path),
 		# FIXME: Maybe specify Python version.
 		"-r", ProjectSettings.globalize_path(requirements_path)]
-	var output : Array = []
-	var pip_download_return : int = python_instance.execute_python(
-		pip_args, output, true, true)
+
+	var output: Array = []
+	var pip_download_return: int = python_instance.execute_python(pip_args, output, true, true)
 
 	# Handle errors or write a success indicator.
 	if pip_download_return != 0:
+		var msg = str(output).replace("\\n", '\n')
+		msg = "Pip failed (platform: " + platform_name + "): " + msg
 		if not automated:
-			OS.alert("Pip failed (platform: " + platform_name + "): " + str(output))
-		push_error("Pip failed (platform: ", platform_name, "): ", output)
+			OS.alert(msg)
+		push_error(msg)
 		return false
 	else:
 		var last_requirements_file : FileAccess = \
