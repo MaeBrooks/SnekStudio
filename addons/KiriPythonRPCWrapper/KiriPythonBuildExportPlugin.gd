@@ -26,11 +26,17 @@ func _export_begin(
 			platform_list.append("Linux-x86_64")
 		if "arm64" in features:
 			platform_list.append("Linux-arm64")
+
 	if "windows" in features:
 		if "x86_64" in features:
 			platform_list.append("Windows-x86_64")
-	# FIXME: MacOS stuff?
-	
+
+	if "macOS" in features:
+		if "arm64" in features:
+			platform_list.append("macOS-arm64")
+		else:
+			push_error("Unknown MacOS platform!")
+
 	for platform in platform_list:
 		var archive_to_export = build_wrangler._detect_archive_for_build(platform)
 		var file_contents : PackedByteArray = FileAccess.get_file_as_bytes(archive_to_export)

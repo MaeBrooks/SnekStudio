@@ -22,7 +22,8 @@ func _process(_delta):
 		updater._start_github_download("Windows-x86_64")
 		updater._start_github_download("Linux-x86_64")
 		updater._start_github_download("Linux-arm64")
-		# FIXME: MacOS.
+		updater._start_github_download("macOS-arm64")
+		# FIXME: MacOS x86_64
 
 		for platform in updater._current_downloads.keys():
 			var download_request : HTTPRequest = updater._current_downloads[platform]
@@ -34,22 +35,8 @@ func _process(_delta):
 						push_error("Download failed (", result, ") (", response_code, ") for platform: ", platform)
 						quit(1))
 
-	# FIXME: Add MacOS.
-	if updater._check_platform_file_ready("Windows-x86_64") and \
-		updater._check_platform_file_ready("Linux-x86_64") and \
-		updater._check_platform_file_ready("Linux-arm64"):
-
-		# Download pip requirements.
-		var succeeded = true
-		if not updater.download_platform_requirements("Windows-x86_64", true):
-			succeeded = false
-		if not updater.download_platform_requirements("Linux-x86_64", true):
-			succeeded = false
-		if not updater.download_platform_requirements("Linux-arm64", true):
-			succeeded = false
-		# FIXME: MacOS.
-
-		if not succeeded:
+	if updater.are_platform_files_ready():
+		if not updater.download_platform_requirements(true):
 			push_error("Something went wrong!")
 			quit(1)
 
