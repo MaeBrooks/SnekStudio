@@ -238,8 +238,8 @@ func _update_platform_ui():
 		if FileAccess.file_exists(requirements_path):
 			var content: String = FileAccess.get_file_as_string(requirements_path)
 
-			var last_written_requirements: Array[String] = content.split("\n")
-			var current_requirements: Array[String] = _platform_status["requirements"]
+			var last_written_requirements = PackedStringArray(content.split("\n"))
+			var current_requirements = PackedStringArray(_platform_status["requirements"])
 
 			if last_written_requirements != current_requirements:
 				_platform_deps_buttons[platform_name].disabled = false
@@ -523,7 +523,7 @@ func _download_platform_requirements(platform_name : String, automated : bool = 
 
 	# Actually run pip.
 	var pip_args = ["-m", "pip", "download",
-		"--platform=" + platform_to_pip_mapping[platform_name],
+		# "--platform=" + platform_to_pip_mapping[platform_name],
 		"--only-binary=:all:",
 		"-d", ProjectSettings.globalize_path(this_platform_download_path),
 		# FIXME: Maybe specify Python version.
