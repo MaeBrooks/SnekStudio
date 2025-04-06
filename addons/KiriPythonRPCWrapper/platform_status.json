@@ -32,6 +32,9 @@
 	}
   },
   "requirements": [
-	"mediapipe"
+	"mediapipe",
+	"psutil",
+	"cv2-enumerate-cameras",
+	"numpy"
   ]
 }
