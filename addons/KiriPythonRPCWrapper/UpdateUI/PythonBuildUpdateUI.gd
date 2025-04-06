@@ -42,7 +42,7 @@ func _load_platform_status():
 	else:
 		_platform_status = {
 			"platforms" : {},
-			"requirements" : ""
+			"requirements" : []
 		}
 		for platform in _platform_list:
 			_platform_status["platforms"][platform] = {}
@@ -72,8 +72,8 @@ func _dropdown_selected(item_index : int, platform_name):
 	_update_platform_ui()
 
 func _on_code_edit_requirements_text_changed() -> void:
-
-	_platform_status["requirements"] = %CodeEdit_Requirements.text
+	var text = str(%CodeEdit_Requirements.text)
+	_platform_status["requirements"] = text.split("\n")
 
 	# FIXME: Put this on a timer so we aren't spamming it super hard.
 	_save_platform_status()
@@ -236,8 +236,12 @@ func _update_platform_ui():
 		var wheel_download_path : String = get_script().resource_path.get_base_dir().path_join("../Wheels").path_join(platform_name)
 		var requirements_path : String = wheel_download_path.path_join("requirements.txt")
 		if FileAccess.file_exists(requirements_path):
-			var last_written_requirements : String = FileAccess.get_file_as_string(requirements_path)
-			if last_written_requirements != _platform_status["requirements"]:
+			var content: String = FileAccess.get_file_as_string(requirements_path)
+
+			var last_written_requirements: Array[String] = content.split("\n")
+			var current_requirements: Array[String] = _platform_status["requirements"]
+
+			if last_written_requirements != current_requirements:
 				_platform_deps_buttons[platform_name].disabled = false
 				_platform_deps_buttons[platform_name].text = "Update"
 			else:
@@ -249,9 +253,11 @@ func _update_platform_ui():
 
 	_update_download_button_progress()
 
+	var current_platform_status_as_text = "\n".join(_platform_status["requirements"])
+
 	if "requirements" in _platform_status:
-		if %CodeEdit_Requirements.text != _platform_status["requirements"]:
-			%CodeEdit_Requirements.text = _platform_status["requirements"]
+		if %CodeEdit_Requirements.text != current_platform_status_as_text:
+			%CodeEdit_Requirements.text = current_platform_status_as_text
 
 
 # Split up a string based on multiple delimeters.
@@ -486,7 +492,7 @@ func _download_platform_requirements(platform_name : String, automated : bool = 
 	DirAccess.make_dir_recursive_absolute(download_path)
 	var requirements_path : String = download_path.path_join("requirements.txt")
 	var requirements_file : FileAccess = FileAccess.open(requirements_path, FileAccess.WRITE)
-	requirements_file.store_string(_platform_status["requirements"])
+	requirements_file.store_string("\n".join(_platform_status["requirements"]))
 	requirements_file.close()
 
 	print("Downloading requirements...")
@@ -539,6 +545,6 @@ func _download_platform_requirements(platform_name : String, automated : bool = 
 			FileAccess.open(
 				this_platform_download_path.path_join("requirements.txt"),
 				FileAccess.WRITE)
-		last_requirements_file.store_string(_platform_status["requirements"])
+		last_requirements_file.store_string("\n".join(_platform_status["requirements"]))
 
 	return true
